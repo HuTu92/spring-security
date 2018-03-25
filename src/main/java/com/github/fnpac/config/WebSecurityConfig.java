@@ -58,6 +58,7 @@ public class WebSecurityConfig {
                         其中bGl1Y2w6cXdlNTIxMzE0 为 liucl:qwe521314 的base64编码，将密码暴露出来了，一定要使用SSL加密通道
                      */
                     .httpBasic()
+                    // 浏览器会弹出对话框并提示：https://localhost:8443 正在请求您的用户名和密码。该网站称：“fnpac”
                     .realmName("fnpac")
                     .and()
                     // 防止跨站请求伪造

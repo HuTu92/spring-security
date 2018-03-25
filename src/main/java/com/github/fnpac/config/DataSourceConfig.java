@@ -1,5 +1,7 @@
 package com.github.fnpac.config;
 
+import com.alibaba.druid.filter.Filter;
+import com.alibaba.druid.filter.logging.Slf4jLogFilter;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.EnvironmentAware;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 刘春龙 on 2018/3/5.
@@ -71,6 +75,16 @@ public class DataSourceConfig implements EnvironmentAware {
     //===============================================
     // 阿里数据库连接池druid
     //===============================================
+    @Bean
+    public Slf4jLogFilter slf4jLogFilter() {
+        Slf4jLogFilter slf4jLogFilter = new Slf4jLogFilter();
+        slf4jLogFilter.setConnectionLogEnabled(false);
+        slf4jLogFilter.setStatementLogEnabled(false);
+        slf4jLogFilter.setResultSetLogEnabled(true);
+        slf4jLogFilter.setStatementExecutableSqlLogEnable(true);
+        return slf4jLogFilter;
+    }
+
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         DruidDataSource druidDataSource = new DruidDataSource();
@@ -82,7 +96,7 @@ public class DataSourceConfig implements EnvironmentAware {
         druidDataSource.setMaxActive(maxActive);
         druidDataSource.setMaxWait(maxWait);
         druidDataSource.setMinIdle(minIdle);
-        druidDataSource.setDefaultAutoCommit(false);
+        druidDataSource.setDefaultAutoCommit(true);
         // additional
         druidDataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
         druidDataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
@@ -95,6 +109,9 @@ public class DataSourceConfig implements EnvironmentAware {
         druidDataSource.setConnectionProperties(connectionProperties);
         try {
             druidDataSource.setFilters(filters);
+            List<Filter> filters = new ArrayList<>();
+            filters.add(slf4jLogFilter());
+            druidDataSource.setProxyFilters(filters);
         } catch (SQLException e) {
             e.printStackTrace();
         }
